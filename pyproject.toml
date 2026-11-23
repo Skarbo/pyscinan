@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyscinan"
+version = "0.1.0"
+description = "Async client for Saswell / Scinan Wi-Fi thermostats (local TCP and cloud API)"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "Kris Skarbo" }]
+dependencies = ["aiohttp>=3.9"]
+keywords = ["saswell", "scinan", "thermostat", "home-assistant", "asyncio"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Home Automation",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/skarbo/pyscinan"
+Issues = "https://github.com/skarbo/pyscinan/issues"
+Changelog = "https://github.com/skarbo/pyscinan/blob/main/CHANGELOG.md"
+
+[project.scripts]
+pyscinan = "pyscinan.cli:main"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/pyscinan", "tests", "README.md", "PROTOCOL.md", "CHANGELOG.md", "LICENSE"]
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ASYNC109", "ASYNC110"]
