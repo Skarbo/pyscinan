@@ -40,6 +40,8 @@ jobs:
           name: dist
           path: dist/
       - uses: astral-sh/setup-uv@v10.4.0
+        with:
+          enable-cache: false
       - run: uv publish --trusted-publishing always --publish-url https://test.pypi.org/legacy/
 
   pypi:
@@ -57,4 +59,6 @@ jobs:
           name: dist
           path: dist/
       - uses: astral-sh/setup-uv@v10.4.0
+        with:
+          enable-cache: false
       - run: uv publish --trusted-publishing always
