@@ -1,19 +1,60 @@
-name: Publish to PyPI
+name: Publish
 
-# Runs when a GitHub release is published. Uses PyPI trusted publishing (no API token):
-# add this repository + workflow + environment "pypi" as a trusted publisher on pypi.org first.
+# PyPI trusted publishing (no API tokens). Register this repository, workflow file
+# (publish.yml) and environment as a trusted publisher on pypi.org / test.pypi.org.
+#
+# - Publishing a GitHub release uploads to PyPI (environment "pypi").
+# - Running the workflow by hand ("Run workflow") uploads to TestPyPI (environment "testpypi").
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
-      id-token: write
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.4.0
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run pytest
       - run: uv build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  testpypi:
+    if: github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/pyscinan
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - uses: astral-sh/setup-uv@v10.4.0
+      - run: uv publish --trusted-publishing always --publish-url https://test.pypi.org/legacy/
+
+  pypi:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pyscinan
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - uses: astral-sh/setup-uv@v10.4.0
       - run: uv publish --trusted-publishing always
