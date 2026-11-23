@@ -248,7 +248,7 @@ class ScinanLocalClient:
                     raise ScinanTimeoutError(
                         f"{self.host} sent no hello; pass device_id explicitly"
                     ) from err
-            await self.request_status()
+            await self._request_first_status()
         except BaseException:
             await self._close_session()
             raise
@@ -256,6 +256,18 @@ class ScinanLocalClient:
         if self.device:
             self.device.online = True
         self._notify()
+
+    async def _request_first_status(self) -> None:
+        """Fetch the first status; ask a second time if it doesn't come.
+
+        Seen once on hardware: the hello arrived, but neither the usual status push nor
+        the answer to our request came within the timeout. A second request worked.
+        """
+        try:
+            await self.request_status()
+        except ScinanTimeoutError:
+            _LOGGER.debug("%s: no status after connect, asking again", self.host)
+            await self.request_status()
 
     async def _close_session(self) -> None:
         was_connected = self._connected

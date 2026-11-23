@@ -136,3 +136,21 @@ async def test_close_stops_reconnect(fake):
     assert not client.connected
     with pytest.raises(ScinanConnectionError):
         await client.set_temperature(20)
+
+
+async def test_connect_asks_again_when_first_status_is_missing(fake):
+    """Seen on hardware: hello, then no status for 5 s. A second request works."""
+    fake.ignore_status_requests = 1
+    async with make_client(fake) as client:
+        assert client.device.target_temperature == 22.0
+    assert fake.received.count(f"/{DEVICE_ID}/S00/1/-1") == 2
+    assert fake.connections == 1  # same connection, no reconnect
+
+
+async def test_connect_gives_up_after_two_missing_statuses(fake):
+    fake.ignore_status_requests = 2
+    client = make_client(fake, reconnect=False)
+    with pytest.raises(ScinanTimeoutError):
+        await client.connect()
+    assert not client.connected
+

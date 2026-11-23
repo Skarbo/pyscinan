@@ -39,6 +39,8 @@ class FakeThermostat:
     send_hello: bool = True
     hello_newline: bool = True
     answer_commands: bool = True
+    ignore_status_requests: int = 0  # don't answer the next N S00 requests
+    connections: int = 0
     state: FakeState = field(default_factory=FakeState)
     received: list[str] = field(default_factory=list)
     server: asyncio.Server | None = None
@@ -72,6 +74,7 @@ class FakeThermostat:
         return f"/{self.device_id}/{code}/1/{data}{chr(13) + chr(10) if newline else ''}".encode()
 
     async def _handle(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+        self.connections += 1
         self.writers.append(writer)
         if self.send_hello:
             writer.write(self._line("type", str(self.device_type), self.hello_newline))
@@ -84,6 +87,9 @@ class FakeThermostat:
                 if len(parts) != 5:
                     continue
                 code, data = parts[2], parts[4]
+                if code == "S00" and self.ignore_status_requests > 0:
+                    self.ignore_status_requests -= 1
+                    continue
                 reply = self._apply(code, data)
                 if reply is not None and self.answer_commands:
                     writer.write(reply)

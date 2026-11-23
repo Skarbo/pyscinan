@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 (2026-11-24)
+
+- Local client: when connecting, ask for the status a second time if the first request gets no answer.
+  Seen on real hardware: the thermostat sent its hello, but no status for 5 seconds. Before, `connect()`
+  failed with `ScinanTimeoutError`.
+
 ## 0.1.0 (2026-11-23)
 
 First release.
