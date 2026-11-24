@@ -22,6 +22,7 @@ DEVICE_TEMP_MAX = 35.0
 class DeviceType(IntEnum):
     """Known thermostat device types (the `type` value in hello / device list)."""
 
+    T13FHL = 3  # electric floor heating, e.g. T13FHL-7(EN) WIFI (reported by a user, cloud)
     WHL = 6  # water floor heating, e.g. SAS922WHL-7W-S-WIFI
     FHL = 9  # electric floor heating, e.g. SAS920FHL-7W-WIFI
 

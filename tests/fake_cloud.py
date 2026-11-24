@@ -43,7 +43,7 @@ DEVICE_LIST = [
         ],
     },
     # Unsupported device type group -> skipped
-    {"type": "3", "devices": [{"id": "10380000000000XX", "company_id": "1038"}]},
+    {"type": "99", "devices": [{"id": "10380000000000XX", "company_id": "1038"}]},
 ]
 
 

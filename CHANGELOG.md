@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3 (2026-11-24)
+
+- Support device type 3 (T13FHL-7(EN) WIFI, electric floor heating) in the cloud device list
+  (`DeviceType.T13FHL`). Thanks to jsvdmeer for finding it.
+
 ## 0.1.2 (2026-11-24)
 
 - Local client: a command sent while disconnected no longer leaves a status waiter behind. Before, closing the

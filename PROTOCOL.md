@@ -13,6 +13,8 @@ port 2000 can control the thermostat.
     /<DEVICE_ID>/<CODE>/<SENSOR_TYPE>/<DATA>
 
 - `DEVICE_ID`: 16 characters, the same ID the cloud uses (thermostats start with `1038`).
+- Device types seen: `3` (T13FHL, electric floor heating), `6` (SAS922WHL, water floor heating), `9`
+  (SAS920FHL, electric floor heating).
 - `CODE`: `S` + 2 hex digits (`S00`, `S02`, `S12` ...), `SPOLL`, or `type` (hello only).
 - `SENSOR_TYPE`: always `1`.
 

@@ -92,7 +92,7 @@ async def test_update_devices_logs_in_lazily_and_parses_list(server, client):
 
     assert len(server.calls(LOGIN)) == 1
     assert server.calls(LIST)[0]["token"] == TOKEN
-    assert set(devices) == {"1038000000000B02", "1038000000000C03"}  # gateway + type 3 skipped
+    assert set(devices) == {"1038000000000B02", "1038000000000C03"}  # gateway + type 99 skipped
 
     dev = devices["1038000000000B02"]
     assert dev.name == "Thermostat_000B02"
@@ -106,6 +106,17 @@ async def test_update_devices_logs_in_lazily_and_parses_list(server, client):
     assert not away.online
     assert away.away
     assert away.target_temperature == 5.0
+
+
+async def test_update_devices_reads_every_supported_type(server, client):
+    """Types 3 (T13FHL), 6 (WHL) and 9 (FHL), each in its own group."""
+    server.device_list = [
+        {"type": t, "devices": [{"id": f"103800000000T00{t}", "company_id": "1038", "online": "1",
+                                 "s00": "1764000000000,1,21.0,22.0,0,0,0,0,0,0,05,35"}]}
+        for t in (3, 6, 9)
+    ]
+    devices = await client.update_devices()
+    assert {dev.type for dev in devices.values()} == {3, 6, 9}
 
 
 async def test_update_devices_keeps_device_objects(server, client):

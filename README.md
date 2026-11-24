@@ -10,7 +10,8 @@ Both clients fill the same `ScinanDevice` model. Used by the
 [Scinan Saswell Thermostat](https://github.com/skarbo/hass-scinan-thermostat) Home Assistant integration.
 
 Tested with the Saswell SAS920FHL-7W-WIFI (electric floor heating). Other thermostats using a Saswell
-Thermostat app (for example SAS922WHL-7W-S-WIFI and Prosmart PST50W) are known to work with the cloud API.
+Thermostat app (for example SAS922WHL-7W-S-WIFI, T13FHL-7(EN) WIFI and Prosmart PST50W) are known to work
+with the cloud API.
 
 ## Install
 
