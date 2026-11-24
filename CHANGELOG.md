@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2 (2026-11-24)
+
+- Local client: a command sent while disconnected no longer leaves a status waiter behind. Before, closing the
+  client afterwards logged "Future exception was never retrieved".
+
 ## 0.1.1 (2026-11-24)
 
 - Local client: when connecting, ask for the status a second time if the first request gets no answer.
