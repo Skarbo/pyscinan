@@ -174,7 +174,11 @@ class ScinanLocalClient:
             await self._send(code, data)
             return None
         waiter = self._new_status_waiter()
-        await self._send(code, data)
+        try:
+            await self._send(code, data)
+        except BaseException:
+            self._drop_waiter(waiter)  # nobody will wait for it
+            raise
         try:
             return await self._wait(waiter)
         except ScinanTimeoutError:
@@ -182,7 +186,11 @@ class ScinanLocalClient:
                 raise
         _LOGGER.debug("%s: no status after %s, requesting S00", self.host, code)
         waiter = self._new_status_waiter()
-        await self._send(Code.STATUS, "-1")
+        try:
+            await self._send(Code.STATUS, "-1")
+        except BaseException:
+            self._drop_waiter(waiter)
+            raise
         return await self._wait(waiter)
 
     async def send_poll(self) -> None:
@@ -213,6 +221,11 @@ class ScinanLocalClient:
         fut: asyncio.Future[ScinanStatus] = asyncio.get_running_loop().create_future()
         self._status_waiters.append(fut)
         return fut
+
+    def _drop_waiter(self, fut: asyncio.Future[ScinanStatus]) -> None:
+        if fut in self._status_waiters:
+            self._status_waiters.remove(fut)
+        fut.cancel()
 
     async def _wait(self, fut: asyncio.Future[ScinanStatus]) -> ScinanStatus:
         try:

@@ -154,3 +154,15 @@ async def test_connect_gives_up_after_two_missing_statuses(fake):
         await client.connect()
     assert not client.connected
 
+
+async def test_command_while_disconnected_leaves_no_waiter(fake):
+    """A failed send must not leave a status waiter that errors later on close."""
+    client = make_client(fake, reconnect=False)
+    await client.connect()
+    await fake.drop_clients()
+    await wait_until(lambda: not client.connected)
+    with pytest.raises(ScinanConnectionError):
+        await client.set_temperature(21)
+    assert client._status_waiters == []
+    await client.close()
+
